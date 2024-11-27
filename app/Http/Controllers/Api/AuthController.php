@@ -15,6 +15,7 @@ class AuthController extends Controller
             'name' => ['required', 'string', 'max:255'],
             'email' => ['required', 'email', 'unique:users', 'max:255'],
             'password' => ['required', 'string', 'min:6'],
+            'is_admin' => ['sometimes','boolean'],
         ]);
 
         // Tworzenie użytkownika z zahaszowanym hasłem
@@ -22,6 +23,8 @@ class AuthController extends Controller
             'name' => $data['name'],
             'email' => $data['email'],
             'password' => Hash::make($data['password']),
+            'is_admin' => $request->is_admin ?? false,
+
         ]);
 
         // Tworzenie tokenu dostępu
@@ -36,7 +39,7 @@ class AuthController extends Controller
     public function login(Request $request)
     {
         $data = $request->validate([
-            'email' => ['required', 'email'],
+            'email' => ['required', 'email', 'exists:users'],
             'password' => ['required', 'string', 'min:6'],
         ]);
 
@@ -56,21 +59,28 @@ class AuthController extends Controller
         ]);
     }
 
-    public function logout(Request $request)
+    public function logout()
     {
         // Usuwa wszystkie tokeny użytkownika
-        $request->user()->tokens()->delete();
+        auth()->user()->tokens()->delete();
 
         return response()->json([
+            'status' => true,
             'message' => 'Logged out successfully',
-        ]);
+            'data' =>[]
+        ], 200);
     }
 
-    public function me(Request $request)
+    public function userprofile()
     {
+        $userData=auth()->user();
         // Zwraca informacje o zalogowanym użytkowniku
         return response()->json([
-            'user' => $request->user(),
-        ]);
+            'status' => true,
+            'message' => "User Login Profile",
+            'data' => $userData,
+            'id' => auth()->user()->id,
+            'points_total' => auth()->user()->points_total,
+        ], 200);
     }
 }

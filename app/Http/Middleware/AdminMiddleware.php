@@ -13,18 +13,40 @@ class AdminMiddleware
     /**
      * Handle an incoming request.
      *
-     * @param  \Closure(\Illuminate\Http\Request): (\Symfony\Component\HttpFoundation\Response)  $next
+     * @param \Closure(\Illuminate\Http\Request): (\Symfony\Component\HttpFoundation\Response) $next
      */
-    public function handle(Request $request, Closure $next): Response
+
+
+
+    public function handle(Request $request, Closure $next)
     {
         //if (!$request->user() || !$request->user()->is_admin) {
         //    return response()->json(['message' => 'Unauthorized. Admins only.'], 403);
         //}
         //return $next($request);
 
-        if(Auth::check() && Auth::user()->is_admin){
+        if (!auth()->check() || !auth()->user()->is_admin) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Unauthorized. Admins only.'
+            ], 403);
+        }
+
+        return $next($request);
+    }}
+/*
+       if(Auth::check() && Auth::user()->is_admin){
             return $next($request);
         }
-        abort(403);
-    }
-}
+        // Jeśli użytkownik nie jest adminem, zwróć odpowiedź JSON z kodem 403
+        return response()->json([
+            'success' => false,
+            'message' => 'Unauthorized. Admins only.'
+        ], 403);
+       */
+
+
+
+
+
+

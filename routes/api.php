@@ -4,6 +4,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Api\UserController;
 use App\Http\Controllers\Api\BrandController;
+use App\Http\Controllers\Api\BrandControllerAdmin;
 use App\Http\Controllers\Api\FuelTypeController;
 use App\Http\Controllers\Api\UserRewardController;
 use App\Http\Controllers\Api\StationController;
@@ -19,28 +20,74 @@ Route::get('/user', function (Request $request) {
     return $request->user();
 })->middleware('auth:sanctum');
 
-// BRANDS
-Route::prefix('brands')->group(function () {
-    Route::get('/', [BrandController::class, 'index']);
-    Route::get('{id}', [BrandController::class, 'show']);
-});
-Route::middleware(['auth:sanctum'])->group(function () {
-    //Route::apiResource('brands', BrandController::class)->except(['index','show']);
-    Route::middleware('is_admin')->group(function () {
-        Route::post('/', [BrandController::class, 'store']);
-        Route::put('{id}', [FuelPriceSuggestionController::class, 'update']);
-        Route::delete('{id}', [FuelPriceSuggestionController::class, 'destroy']);
-    });
-});
-
-// Rejestracja i logowanie
+// REJESTRACJA I LOGOWANIE
+// Zwykly użytkownik
 Route::post("/register", [AuthController::class, 'register']);
 Route::post("/login", [AuthController::class, 'login']);
-
 // Zalogowani użytkownicy
-Route::middleware('auth:sanctum')->group(function () {
-    Route::post('logout', [AuthController::class, 'logout']);
-    Route::get('me', [AuthController::class, 'me']);});
+Route::group(["middleware" => "auth:sanctum"], function (){
+    Route::get('userprofile', [AuthController::class, 'userprofile']);
+    Route::get('logout', [AuthController::class, 'logout']);
+});
+
+// BRANDS
+// Zwykly użytkownik
+Route::prefix('brands')->group(function () {
+    // Zwykly użytkownik
+    Route::get('/', [BrandController::class, 'index']);
+    Route::get('{id}', [BrandController::class, 'show']);
+    //Route::delete('{id}', [BrandControllerAdmin::class, 'destroy'])->middleware(AdminMiddleware::class);
+});
+// Zalogowani administratorzy
+Route::prefix('brands')->middleware(["auth:sanctum", "admin"])->group(function () {
+    Route::post('/', [BrandControllerAdmin::class, 'store']);
+    Route::put('{id}', [BrandControllerAdmin::class, 'update']);
+    Route::delete('{id}', [BrandControllerAdmin::class, 'destroy']);
+});
+
+//Route::delete('/brands/{id}',[BrandControllerAdmin::class, 'destroy'])->middleware('admin');
+
+// Zalogowani administratorzy
+Route::prefix('brands')->middleware('is_admin')->group(function () {
+    //Route::post('/', [BrandControllerAdmin::class, 'store']);
+    //Route::put('{id}', [BrandControllerAdmin::class, 'update']);
+    //Route::delete('{id}', [BrandControllerAdmin::class, 'destroy']);
+});
+// Zalogowani administratorzy
+//Route::group(["middleware" => "is_admin"], function (){
+//    Route::post('/', [BrandControllerAdmin::class, 'store']);
+//    Route::put('{id}', [BrandControllerAdmin::class, 'update']);
+    //Route::delete('{id}', [BrandControllerAdmin::class, 'destroy']);
+//});
+//});
+
+//Route::middleware([AdminMiddleware::class])->prefix('brands')->group(function(){
+ //   Route::delete('{id}', [BrandControllerAdmin::class, 'destroy']);
+//});
+
+//Route::group([
+ //   "middleware" => "auth:sanctum", "is_admin"
+//], function (){
+//    Route::post('/', [BrandController::class, 'store']);
+//    Route::put('{id}', [FuelPriceSuggestionController::class, 'update']);
+//    Route::delete('{id}', [FuelPriceSuggestionController::class, 'destroy']);
+//});
+
+
+
+
+
+
+
+
+
+
+
+
+//Route::middleware('auth:sanctum')->group(function () {
+    //Route::post('logout', [AuthController::class, 'logout']);
+    //Route::get('me', [AuthController::class, 'me']);
+//});
 
 /*
 
