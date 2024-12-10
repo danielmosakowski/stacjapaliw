@@ -21,7 +21,7 @@ Wykonaj poniższe kroki, aby zainstalować i uruchomić projekt lokalnie:
 ### 1. Klonowanie repozytorium
 ```bash
 git clone https://github.com/danielmosakowski/stacjapaliw.git
-cd SklepKomputerowy
+cd stacjapaliw
 ```
 
 ### 2. Instalacja zależności PHP
