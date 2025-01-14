@@ -16,7 +16,6 @@ class BrandController extends Controller
         return response()->json(Brand::all(), 200);
     }
 
-
     /**
      * Display the specified resource.
      */
@@ -26,5 +25,27 @@ class BrandController extends Controller
     }
 
 
+    public function store(Request $request)
+    {
+        $request->validate([
+            'name' => 'required|unique:brands|max:255',
+        ]);
+        return Brand::create($request->all());
+    }
 
+    public function update(Request $request, string $id)
+    {
+        $brand = Brand::findOrFail($id);
+        $brand->update($request->all());
+
+        return $brand;
+    }
+
+    public function destroy(string $id)
+    {
+        Brand::destroy($id);
+
+        return response()->noContent();//
+    }
 }
+

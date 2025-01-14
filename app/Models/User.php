@@ -66,4 +66,8 @@ class User extends Authenticatable
     {
         return $this->HasMany(UserReward::class);
     }
+    public function isAdmin()
+    {
+        return $this->is_admin === 1;
+    }
 }

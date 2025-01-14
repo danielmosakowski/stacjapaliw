@@ -83,4 +83,5 @@ class UserController extends Controller
 
         return response()->json(null, 204);  // Zwróci status 204 (brak treści), jeśli usunięto użytkownika
     }
+
 }

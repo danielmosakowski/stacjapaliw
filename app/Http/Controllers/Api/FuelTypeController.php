@@ -17,22 +17,18 @@ class FuelTypeController extends Controller
     }
 
     /**
-     * Store a newly created resource in storage.
+     * Display the specified resource.
      */
+    public function show(string $id)
+    {
+        return FuelType::findOrFail($id);
+    }
     public function store(Request $request)
     {
         $request->validate([
             'name' => 'required|unique:fuel_types|max:255',
         ]);
         return FuelType::create($request->all());
-    }
-
-    /**
-     * Display the specified resource.
-     */
-    public function show(string $id)
-    {
-        return FuelType::findOrFail($id);
     }
 
     /**
@@ -55,4 +51,5 @@ class FuelTypeController extends Controller
 
         return response()->noContent();
     }
+
 }

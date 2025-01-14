@@ -8,11 +8,11 @@ use App\Models\FuelPriceSuggestion;
 
 class FuelPriceSuggestionController extends Controller
 {
-    public function __construct()
-    {
-        // Middleware auth:sanctum chroni wszystkie metody tego kontrolera
-        $this->middleware('auth:sanctum');
-    }
+//    public function __construct()
+//    {
+    // Middleware auth:sanctum chroni wszystkie metody tego kontrolera
+ //       $this->middleware('auth:sanctum');
+//    }
     /**
      * Display a listing of the resource.
      */
@@ -45,10 +45,6 @@ class FuelPriceSuggestionController extends Controller
         $fuelPriceSuggestion = FuelPriceSuggestion::findOrFail($id);
         return response()->json($fuelPriceSuggestion);
     }
-
-    /**
-     * Update the specified resource in storage.
-     */
     public function update(Request $request, string $id)
     {
         $fuelPriceSuggestion = FuelPriceSuggestion::findOrFail($id);
@@ -76,4 +72,5 @@ class FuelPriceSuggestionController extends Controller
 
         return response()->noContent();
     }
+
 }
