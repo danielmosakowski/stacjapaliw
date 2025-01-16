@@ -9,13 +9,22 @@ class StationFuelTypesSeeder extends Seeder
 {
     public function run()
     {
-        DB::table('station_fuel_types')->insert([
-            ['station_id' => 1, 'fuel_type_id' => 1], // Orlen - Benzyna
-            ['station_id' => 2, 'fuel_type_id' => 2], // Shell - Diesel
-            ['station_id' => 3, 'fuel_type_id' => 1], // Orlen - Benzyna
-            ['station_id' => 4, 'fuel_type_id' => 2], // MOL - Diesel
-            ['station_id' => 5, 'fuel_type_id' => 3], // Auchan - LPG
-            // Możesz dodać więcej stacji i przypisanych typów paliw
-        ]);
+        // Pobieramy wszystkie stacje i wszystkie typy paliw
+        $stations = DB::table('stations')->get();
+        $fuelTypes = DB::table('fuel_types')->pluck('id'); // Pobiera tylko ID typów paliw
+
+        // Tworzymy dane do wstawienia
+        $stationFuelData = [];
+        foreach ($stations as $station) {
+            foreach ($fuelTypes as $fuelTypeId) {
+                $stationFuelData[] = [
+                    'station_id' => $station->id,
+                    'fuel_type_id' => $fuelTypeId,
+                ];
+            }
+        }
+
+        // Wstawiamy dane do tabeli `station_fuel_types`
+        DB::table('station_fuel_types')->insert($stationFuelData);
     }
 }

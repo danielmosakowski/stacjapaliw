@@ -10,8 +10,7 @@ class StationsSeeder extends Seeder
 {
     public function run()
     {
-        // Załóżmy, że masz już dane w tabeli `brands`, w których zapisane są marki
-        // Przykładowe id dla marek:
+        //Dane z tabeli brands
         $brands = [
             'Orlen' => 1,
             'Shell' => 2,

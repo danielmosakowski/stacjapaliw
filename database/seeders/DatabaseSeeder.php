@@ -12,14 +12,10 @@ class DatabaseSeeder extends Seeder
      */
     public function run(): void
     {
-        // Create a specific user
-        User::factory()->create([
-            'name' => 'Test User4',
-            'email' => 'test4@example.com',
-        ]);
-
-        // Call other seeders
+        
+        // Call seeders
         $this->call([
+            FuelTypesSeeder::class,
             BrandsSeeder::class,
             StationsSeeder::class,
             StationFuelTypesSeeder::class,
