@@ -34,8 +34,8 @@ class Station extends Model
         return $this->HasMany(StationPrice::class);
     }
 
-    public function fuelPriceSuggestions(): HasMany
-    {
-        return $this->HasMany(FuelPriceSuggestion::class);
-    }
+    //public function fuelPriceSuggestions(): HasMany
+    //{
+    //    return $this->HasMany(FuelPriceSuggestion::class);
+    //}
 }

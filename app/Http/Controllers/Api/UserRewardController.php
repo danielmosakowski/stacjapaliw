@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
+use App\Models\UserReward;
 
 class UserRewardController extends Controller
 {
@@ -28,7 +29,14 @@ class UserRewardController extends Controller
 
         return UserReward::create($request->all());
     }
+    public function showUserRewards($userId)
+    {
+        // Pobranie nagród przypisanych do użytkownika
+        $rewards = UserReward::where('user_id', $userId)->get();
 
+        // Zwrócenie nagród w formacie JSON
+        return response()->json($rewards);
+    }
     /**
      * Display the specified resource.
      */

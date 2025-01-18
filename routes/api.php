@@ -130,6 +130,7 @@ Route::prefix('users')->middleware(["auth:sanctum", "admin"])->group(function ()
 // Niezalogowany użytkownik
 Route::prefix('user-rewards')->group(function () {
     Route::get('/', [UserRewardController::class, 'index']);
+    Route::get('/user/{userId}', [UserRewardController::class, 'showUserRewards']);
     Route::get('{id}', [UserRewardController::class, 'show']);
 });
 // Zalogowany administrator

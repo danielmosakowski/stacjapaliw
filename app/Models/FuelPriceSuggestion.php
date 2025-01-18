@@ -16,7 +16,7 @@ class FuelPriceSuggestion extends Model
     // Relacja z tabelą 'stations'
     public function station(): BelongsTo
     {
-        return $this->belongsTo(Station::class);
+        return $this->belongsTo(StationFuelType::class);
     }
 
     // Relacja z tabelą 'users'

@@ -34,4 +34,9 @@ class StationFuelType extends Model
     {
         return $this->hasMany(StationPrice::class);
     }
+
+    public function fuelPriceSuggestions(): HasMany
+    {
+        return $this->HasMany(FuelPriceSuggestion::class);
+    }
 }
