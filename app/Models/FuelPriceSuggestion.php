@@ -11,7 +11,7 @@ class FuelPriceSuggestion extends Model
     use HasFactory;
 
     protected $table = 'fuel_price_suggestions';
-    protected $fillable = ['user_id', 'station_id', 'suggested_price', 'photo_path', 'price_date', 'approved'];
+    protected $fillable = ['user_id', 'station_fuel_type_id', 'suggested_price', 'photo_path', 'price_date', 'approved'];
 
     // Relacja z tabelą 'stations'
     public function station(): BelongsTo
