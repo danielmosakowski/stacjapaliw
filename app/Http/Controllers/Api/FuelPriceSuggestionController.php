@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
+use App\Models\UserReward;
 use Illuminate\Http\Request;
 use App\Models\FuelPriceSuggestion;
 
@@ -32,6 +33,7 @@ class FuelPriceSuggestionController extends Controller
             'suggested_price' => 'required|numeric',
             'price_date' => 'required|date',
             'photo_path' => 'nullable|string', // Jeżeli jest opcjonalna
+            'station_fuel_price_id' => 'required|exists:station_fuel_prices,id',
         ]);
 
         return FuelPriceSuggestion::create($request->all());
@@ -45,6 +47,17 @@ class FuelPriceSuggestionController extends Controller
         $fuelPriceSuggestion = FuelPriceSuggestion::findOrFail($id);
         return response()->json($fuelPriceSuggestion);
     }
+
+    public function showUserFuelPriceSuggestion($userId)
+    {
+        // Pobranie nagród przypisanych do użytkownika
+        $fuelPriceSuggestion = FuelPriceSuggestion::where('user_id', $userId)->get();
+
+        // Zwrócenie nagród w formacie JSON
+        return response()->json($fuelPriceSuggestion);
+    }
+
+
     public function update(Request $request, string $id)
     {
         $fuelPriceSuggestion = FuelPriceSuggestion::findOrFail($id);
@@ -55,6 +68,7 @@ class FuelPriceSuggestionController extends Controller
             'suggested_price' => 'sometimes|numeric',
             'price_date' => 'sometimes|date',
             'photo_path' => 'nullable|string', // Jeżeli jest opcjonalna
+            'station_fuel_price_id' => 'required|exists:station_fuel_prices,id',
         ]);
 
         $fuelPriceSuggestion->update($request->all());

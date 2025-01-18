@@ -55,6 +55,7 @@ Route::prefix('brands')->middleware(["auth:sanctum", "admin"])->group(function (
 // Zalogowany użytkownik
 Route::prefix('fuel-price-suggestions')->middleware("auth:sanctum")->group(function () {
     Route::get('/', [FuelPriceSuggestionController::class, 'index']);
+    Route::get('/user/{userId}', [FuelPriceSuggestionController::class, 'showUserFuelPriceSuggestion']);
     Route::get('{id}', [FuelPriceSuggestionController::class, 'show']);
     Route::post('/', [FuelPriceSuggestionController::class, 'store']);
 });
