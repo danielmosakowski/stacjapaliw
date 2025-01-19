@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\UserReward;
 use Illuminate\Http\Request;
 use App\Models\FuelPriceSuggestion;
+use Illuminate\Support\Facades\Storage;  // Dodanie aliasu dla Storage
 
 class FuelPriceSuggestionController extends Controller
 {
@@ -27,16 +28,37 @@ class FuelPriceSuggestionController extends Controller
      */
     public function store(Request $request)
     {
+        // Walidacja danych wejściowych
         $request->validate([
             'user_id' => 'required|exists:users,id',
-            'station_id' => 'required|exists:stations,id',
-            'suggested_price' => 'required|numeric',
+            'station_fuel_type_id' => 'required|exists:station_fuel_types,id',
+            'suggested_price' => 'required|numeric|min:0',
             'price_date' => 'required|date',
-            'photo_path' => 'nullable|string', // Jeżeli jest opcjonalna
-            'station_fuel_price_id' => 'required|exists:station_fuel_prices,id',
+            'photo' => 'nullable|image|mimes:jpeg,png,jpg|max:2048', // Walidacja zdjęcia
         ]);
 
-        return FuelPriceSuggestion::create($request->all());
+        // Tworzenie nowej sugestii ceny
+        $suggestion = new FuelPriceSuggestion();
+
+        // Masowe przypisanie danych
+        $suggestion->fill([
+            'user_id' => $request->user_id,
+            'station_fuel_type_id' => $request->station_fuel_type_id,
+            'suggested_price' => $request->suggested_price,
+            'price_date' => $request->price_date,
+        ]);
+
+        // Obsługa zdjęcia
+        if ($request->hasFile('photo')) {
+            $path = $request->file('photo')->store('photos', 'public'); // Zapisz zdjęcie w publicznym folderze
+            $suggestion->photo_path = $path;
+        }
+
+        // Zapisz dane w bazie
+        $suggestion->save();
+
+        // Odpowiedź z sukcesem
+        return response()->json($suggestion, 201);
     }
 
     /**
@@ -62,16 +84,24 @@ class FuelPriceSuggestionController extends Controller
     {
         $fuelPriceSuggestion = FuelPriceSuggestion::findOrFail($id);
 
-        $request->validate([
+        $validated = $request->validate([
             'user_id' => 'sometimes|exists:users,id',
-            'station_id' => 'sometimes|exists:stations,id',
             'suggested_price' => 'sometimes|numeric',
             'price_date' => 'sometimes|date',
-            'photo_path' => 'nullable|string', // Jeżeli jest opcjonalna
-            'station_fuel_price_id' => 'required|exists:station_fuel_prices,id',
+            'photo' => 'nullable|image|mimes:jpg,jpeg,png',
+            'station_fuel_type_id' => 'sometimes|exists:station_fuel_types,id',
         ]);
 
-        $fuelPriceSuggestion->update($request->all());
+        if ($request->hasFile('photo')) {
+            if ($fuelPriceSuggestion->photo_path) {
+                Storage::disk('public')->delete($fuelPriceSuggestion->photo_path);
+            }
+
+            $photoPath = $request->file('photo')->store('photos', 'public');
+            $fuelPriceSuggestion->photo_path = $photoPath;
+        }
+
+        $fuelPriceSuggestion->update($validated);
 
         return response()->json($fuelPriceSuggestion);
     }
@@ -82,6 +112,11 @@ class FuelPriceSuggestionController extends Controller
     public function destroy(string $id)
     {
         $fuelPriceSuggestion = FuelPriceSuggestion::findOrFail($id);
+
+        if ($fuelPriceSuggestion->photo_path) {
+            Storage::disk('public')->delete($fuelPriceSuggestion->photo_path);
+        }
+
         $fuelPriceSuggestion->delete();
 
         return response()->noContent();
