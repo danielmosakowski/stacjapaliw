@@ -61,6 +61,7 @@ Route::prefix('fuel-price-suggestions')->middleware("auth:sanctum")->group(funct
 });
 // Zalogowany administrator
 Route::prefix('fuel-price-suggestions')->middleware(["auth:sanctum", "admin"])->group(function () {
+    Route::get('/', [FuelPriceSuggestionController::class, 'showAllFuelPriceSuggestions']);
     Route::put('{id}', [FuelPriceSuggestionController::class, 'update']);
     Route::delete('{id}', [FuelPriceSuggestionController::class, 'destroy']);
 });
