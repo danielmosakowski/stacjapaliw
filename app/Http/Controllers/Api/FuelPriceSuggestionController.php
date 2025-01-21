@@ -110,6 +110,18 @@ class FuelPriceSuggestionController extends Controller
                 $user->increment('points_total', 1);
                 \Log::info('Punkty dodane użytkownikowi:', ['user_id' => $user->id, 'new_points_total' => $user->points_total]);
             }
+
+            // Aktualizacja ceny w tabeli `STATION_PRICES` na podstawie `station_fuel_type_id`
+            $stationPrice = \App\Models\StationPrice::where('station_fuel_type_id', $fuelPriceSuggestion->station_fuel_type_id)->first();
+
+            if ($stationPrice) {
+                $stationPrice->price = $fuelPriceSuggestion->suggested_price; // Zmiana ceny
+                $stationPrice->save();
+            } else {
+                \Log::error('Nie znaleziono rekordu w tabeli STATION_PRICES', [
+                    'station_fuel_type_id' => $fuelPriceSuggestion->station_fuel_type_id,
+                ]);
+            }
         }
     
         // Zmieniamy status na zatwierdzony lub niezatwierdzony
