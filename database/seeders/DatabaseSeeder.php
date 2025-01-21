@@ -19,6 +19,7 @@ class DatabaseSeeder extends Seeder
             BrandsSeeder::class,
             StationsSeeder::class,
             StationFuelTypesSeeder::class,
+            StationPricesSeeder::class,
         ]);
     }
 }

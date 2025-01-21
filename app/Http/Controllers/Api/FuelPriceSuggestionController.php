@@ -91,28 +91,51 @@ class FuelPriceSuggestionController extends Controller
             'price_date' => 'sometimes|date',
             'photo' => 'nullable|image|mimes:jpg,jpeg,png',
             'station_fuel_type_id' => 'sometimes|exists:station_fuel_types,id',
-            'approved' => 'sometimes|in:0,1',  // Dodana walidacja dla statusu 'approved'
+            'approved' => 'sometimes|in:0,1',
         ]);
-    
-        // Obsługa pliku zdjęcia (bez zmian)
+
+        // Obsługa zdjęcia
         if ($request->hasFile('photo')) {
             if ($fuelPriceSuggestion->photo_path) {
                 Storage::disk('public')->delete($fuelPriceSuggestion->photo_path);
             }
-    
             $photoPath = $request->file('photo')->store('photos', 'public');
             $fuelPriceSuggestion->photo_path = $photoPath;
         }
     
-        // Aktualizacja danych, w tym ewentualna zmiana statusu zatwierdzenia (approved)
-        if ($request->has('approved')) {
-            $fuelPriceSuggestion->approved = $request->approved; // Zmieniamy status na zatwierdzony lub niezatwierdzony
+        // Jeśli zatwierdzono propozycję, dodaj punkt do użytkownika
+        if ($request->has('approved') && $request->approved == 1) {
+            $user = $fuelPriceSuggestion->user;
+            if ($user) {
+                $user->increment('points_total', 1);
+                \Log::info('Punkty dodane użytkownikowi:', ['user_id' => $user->id, 'new_points_total' => $user->points_total]);
+            }
+
+            // Aktualizacja ceny w tabeli `STATION_PRICES` na podstawie `station_fuel_type_id`
+            $stationPrice = \App\Models\StationPrice::where('station_fuel_type_id', $fuelPriceSuggestion->station_fuel_type_id)->first();
+
+            if ($stationPrice) {
+                $stationPrice->price = $fuelPriceSuggestion->suggested_price; // Zmiana ceny
+                $stationPrice->save();
+            } else {
+                \Log::error('Nie znaleziono rekordu w tabeli STATION_PRICES', [
+                    'station_fuel_type_id' => $fuelPriceSuggestion->station_fuel_type_id,
+                ]);
+            }
         }
     
+        // Zmieniamy status na zatwierdzony lub niezatwierdzony
+        if ($request->has('approved')) {
+            $fuelPriceSuggestion->approved = $request->approved;
+        }
+    
+        // Zaktualizuj propozycję
         $fuelPriceSuggestion->update($validated);
     
         return response()->json($fuelPriceSuggestion);
     }
+    
+    
     
 
     /**
@@ -133,11 +156,7 @@ class FuelPriceSuggestionController extends Controller
 
     public function showAllFuelPriceSuggestions()
     {
-        // Pobranie wszystkich zgłoszeń
-        $fuelPriceSuggestions = FuelPriceSuggestion::all();
-    
-        // Zwrócenie zgłoszeń w formacie JSON
-        return response()->json($fuelPriceSuggestions);
+        return FuelPriceSuggestion::with('user')->get();
     }
     
 
