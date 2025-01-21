@@ -86,33 +86,30 @@ class FuelPriceSuggestionController extends Controller
     
         // Walidacja danych wejściowych (zachowana logika)
         $validated = $request->validate([
-            'user_id' => 'sometimes|exists:users,id',
-            'suggested_price' => 'sometimes|numeric',
-            'price_date' => 'sometimes|date',
-            'photo' => 'nullable|image|mimes:jpg,jpeg,png',
-            'station_fuel_type_id' => 'sometimes|exists:station_fuel_types,id',
-            'approved' => 'sometimes|in:0,1',  // Dodana walidacja dla statusu 'approved'
+            'approved' => 'sometimes|in:0,1',
         ]);
     
-        // Obsługa pliku zdjęcia (bez zmian)
-        if ($request->hasFile('photo')) {
-            if ($fuelPriceSuggestion->photo_path) {
-                Storage::disk('public')->delete($fuelPriceSuggestion->photo_path);
+        // Jeśli zatwierdzono propozycję, dodaj punkt do użytkownika
+        if ($request->has('approved') && $request->approved == 1) {
+            $user = $fuelPriceSuggestion->user;
+            if ($user) {
+                $user->increment('points_total', 1);
+                \Log::info('Punkty dodane użytkownikowi:', ['user_id' => $user->id, 'new_points_total' => $user->points_total]);
             }
-    
-            $photoPath = $request->file('photo')->store('photos', 'public');
-            $fuelPriceSuggestion->photo_path = $photoPath;
         }
     
-        // Aktualizacja danych, w tym ewentualna zmiana statusu zatwierdzenia (approved)
+        // Zmieniamy status na zatwierdzony lub niezatwierdzony
         if ($request->has('approved')) {
-            $fuelPriceSuggestion->approved = $request->approved; // Zmieniamy status na zatwierdzony lub niezatwierdzony
+            $fuelPriceSuggestion->approved = $request->approved;
         }
     
+        // Zaktualizuj propozycję
         $fuelPriceSuggestion->update($validated);
     
         return response()->json($fuelPriceSuggestion);
     }
+    
+    
     
 
     /**
