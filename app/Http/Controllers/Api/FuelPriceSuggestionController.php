@@ -133,11 +133,7 @@ class FuelPriceSuggestionController extends Controller
 
     public function showAllFuelPriceSuggestions()
     {
-        // Pobranie wszystkich zgłoszeń
-        $fuelPriceSuggestions = FuelPriceSuggestion::all();
-    
-        // Zwrócenie zgłoszeń w formacie JSON
-        return response()->json($fuelPriceSuggestions);
+        return FuelPriceSuggestion::with('user')->get();
     }
     
 
