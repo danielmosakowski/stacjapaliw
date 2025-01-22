@@ -65,8 +65,8 @@ class StationController extends Controller
      */
     public function destroy($id)
     {
-        Station::destroy($id);
-
-        return response()->noContent();
+        $station = Station::findOrFail($id);
+        $station->delete();
+        return response()->json(['message' => 'Stacja została usunięta.'], 200);
     }
 }

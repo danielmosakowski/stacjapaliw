@@ -43,9 +43,9 @@ class BrandController extends Controller
 
     public function destroy(string $id)
     {
-        Brand::destroy($id);
-
-        return response()->noContent();//
+        $brand = Brand::findOrFail($id);
+        $brand->delete();
+        return response()->json(['message' => 'Marka została usunięta.'], 200);
     }
 }
 
