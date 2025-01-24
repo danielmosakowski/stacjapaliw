@@ -79,8 +79,12 @@ class UserController extends Controller
     public function destroy(string $id)
     {
         $user = User::findOrFail($id);  // Znajdź użytkownika po id
-        $user->delete();  // Usuń użytkownika
 
+        if ($user->isAdmin()) {
+            return response()->json(['error' => 'Nie możesz usunąć administratora!'], 403);
+        }
+        
+        $user->delete();  // Usuń użytkownika
         return response()->json(null, 204);  // Zwróci status 204 (brak treści), jeśli usunięto użytkownika
     }
 
