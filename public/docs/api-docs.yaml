@@ -1,236 +1,367 @@
 openapi: 3.0.0
 info:
-  title: Laravel API
-  description: Dokumentacja API aplikacji stworzonej w Laravel
+  title: Fuel Station API
   version: 1.0.0
+  description: API do zarządzania stacjami paliwowymi, cenami, rodzajami paliw, użytkownikami i klientami.
+
 servers:
-  - url: http://localhost:8000/api
-    description: Lokalny serwer deweloperski
+  - url: https://api.fuelstations.com/v1
 
 paths:
-  /user:
-    get:
-      summary: Pobierz dane zalogowanego użytkownika
-      security:
-        - sanctumAuth: []
-      responses:
-        '200':
-          description: Dane użytkownika
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/User'
-
-  /register:
-    post:
-      summary: Zarejestruj użytkownika
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/RegisterUser'
-      responses:
-        '201':
-          description: Użytkownik zarejestrowany
-
-  /login:
-    post:
-      summary: Zaloguj użytkownika
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/LoginUser'
-      responses:
-        '200':
-          description: Zalogowano użytkownika
-
-  /userprofile:
-    get:
-      summary: Pobierz profil użytkownika
-      security:
-        - sanctumAuth: []
-      responses:
-        '200':
-          description: Profil użytkownika
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/User'
-
-  /logout:
-    post:
-      summary: Wyloguj użytkownika
-      security:
-        - sanctumAuth: []
-      responses:
-        '204':
-          description: Wylogowano użytkownika
-
-  /brands:
-    get:
-      summary: Pobierz listę marek
-      responses:
-        '200':
-          description: Lista marek
-          content:
-            application/json:
-              schema:
-                type: array
-                items:
-                  $ref: '#/components/schemas/Brand'
-    post:
-      summary: Dodaj nową markę
-      security:
-        - sanctumAuth: []
-        - adminAuth: []
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/BrandInput'
-      responses:
-        '201':
-          description: Marka dodana
-
-  /brands/{id}:
-    get:
-      summary: Pobierz szczegóły marki
-      parameters:
-        - name: id
-          in: path
-          required: true
-          schema:
-            type: integer
-      responses:
-        '200':
-          description: Szczegóły marki
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Brand'
-    put:
-      summary: Zaktualizuj markę
-      security:
-        - sanctumAuth: []
-        - adminAuth: []
-      parameters:
-        - name: id
-          in: path
-          required: true
-          schema:
-            type: integer
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/BrandInput'
-      responses:
-        '200':
-          description: Marka zaktualizowana
-    delete:
-      summary: Usuń markę
-      security:
-        - sanctumAuth: []
-        - adminAuth: []
-      parameters:
-        - name: id
-          in: path
-          required: true
-          schema:
-            type: integer
-      responses:
-        '204':
-          description: Marka usunięta
-
-  /fuel-price-suggestions:
-    get:
-      summary: Pobierz sugestie cen paliw
-      security:
-        - sanctumAuth: []
-      responses:
-        '200':
-          description: Sugestie cen paliw
-          content:
-            application/json:
-              schema:
-                type: array
-                items:
-                  $ref: '#/components/schemas/FuelPriceSuggestion'
-    post:
-      summary: Dodaj nową sugestię ceny paliwa
-      security:
-        - sanctumAuth: []
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/FuelPriceSuggestionInput'
-      responses:
-        '201':
-          description: Sugestia ceny paliwa dodana
-
-  /fuel-types:
-    get:
-      summary: Pobierz typy paliw
-      responses:
-        '200':
-          description: Lista typów paliw
-          content:
-            application/json:
-              schema:
-                type: array
-                items:
-                  $ref: '#/components/schemas/FuelType'
-    post:
-      summary: Dodaj nowy typ paliwa
-      security:
-        - sanctumAuth: []
-        - adminAuth: []
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/FuelTypeInput'
-      responses:
-        '201':
-          description: Typ paliwa dodany
-
   /stations:
     get:
-      summary: Pobierz listę stacji
+      summary: Pobierz listę stacji paliw
+      operationId: getStations
+      tags:
+        - Stations
       responses:
         '200':
-          description: Lista stacji
+          description: Lista stacji paliw
           content:
             application/json:
               schema:
                 type: array
                 items:
                   $ref: '#/components/schemas/Station'
+
     post:
-      summary: Dodaj nową stację
-      security:
-        - sanctumAuth: []
-        - adminAuth: []
+      summary: Dodaj nową stację paliw
+      operationId: createStation
+      tags:
+        - Stations
       requestBody:
+        description: Dane nowej stacji paliw
         required: true
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/StationInput'
+              $ref: '#/components/schemas/Station'
       responses:
         '201':
-          description: Stacja dodana
+          description: Stacja została dodana
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Station'
+
+  /stations/{id}:
+    get:
+      summary: Pobierz szczegóły stacji
+      operationId: getStationById
+      tags:
+        - Stations
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: ID stacji paliw
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Szczegóły stacji paliw
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Station'
+
+    put:
+      summary: Zaktualizuj dane stacji
+      operationId: updateStation
+      tags:
+        - Stations
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: ID stacji paliw
+          schema:
+            type: integer
+      requestBody:
+        description: Zaktualizowane dane stacji
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Station'
+      responses:
+        '200':
+          description: Zaktualizowana stacja paliw
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Station'
+
+    delete:
+      summary: Usuń stację paliw
+      operationId: deleteStation
+      tags:
+        - Stations
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: ID stacji paliw
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Stacja została usunięta
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: "Stacja została usunięta."
+
+  /users:
+    get:
+      summary: Pobierz listę użytkowników
+      operationId: getUsers
+      tags:
+        - Users
+      responses:
+        '200':
+          description: Lista użytkowników
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/User'
+
+    post:
+      summary: Dodaj nowego użytkownika
+      operationId: createUser
+      tags:
+        - Users
+      requestBody:
+        description: Dane nowego użytkownika
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/User'
+      responses:
+        '201':
+          description: Użytkownik został dodany
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/User'
+
+  /users/{id}:
+    get:
+      summary: Pobierz szczegóły użytkownika
+      operationId: getUserById
+      tags:
+        - Users
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: ID użytkownika
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Szczegóły użytkownika
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/User'
+
+    put:
+      summary: Zaktualizuj dane użytkownika
+      operationId: updateUser
+      tags:
+        - Users
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: ID użytkownika
+          schema:
+            type: integer
+      requestBody:
+        description: Zaktualizowane dane użytkownika
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/User'
+      responses:
+        '200':
+          description: Zaktualizowany użytkownik
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/User'
+
+    delete:
+      summary: Usuń użytkownika
+      operationId: deleteUser
+      tags:
+        - Users
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: ID użytkownika
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Użytkownik został usunięty
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: "Użytkownik został usunięty."
+
+  /fuel-price-suggestions:
+    get:
+      summary: Pobierz propozycje cen paliw
+      operationId: getFuelPriceSuggestions
+      tags:
+        - Fuel Price Suggestions
+      responses:
+        '200':
+          description: Lista propozycji cen paliw
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/FuelPriceSuggestion'
+
+    post:
+      summary: Dodaj propozycję ceny paliwa
+      operationId: createFuelPriceSuggestion
+      tags:
+        - Fuel Price Suggestions
+      requestBody:
+        description: Dane propozycji ceny paliwa
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/FuelPriceSuggestion'
+      responses:
+        '201':
+          description: Propozycja ceny paliwa została dodana
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/FuelPriceSuggestion'
+
+  /fuel-price-suggestions/{id}:
+    get:
+      summary: Pobierz szczegóły propozycji ceny paliwa
+      operationId: getFuelPriceSuggestionById
+      tags:
+        - Fuel Price Suggestions
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: ID propozycji ceny paliwa
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Szczegóły propozycji ceny paliwa
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/FuelPriceSuggestion'
+
+    put:
+      summary: Zaktualizuj propozycję ceny paliwa
+      operationId: updateFuelPriceSuggestion
+      tags:
+        - Fuel Price Suggestions
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: ID propozycji ceny paliwa
+          schema:
+            type: integer
+      requestBody:
+        description: Zaktualizowane dane propozycji ceny paliwa
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/FuelPriceSuggestion'
+      responses:
+        '200':
+          description: Zaktualizowana propozycja ceny paliwa
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/FuelPriceSuggestion'
+
+    delete:
+      summary: Usuń propozycję ceny paliwa
+      operationId: deleteFuelPriceSuggestion
+      tags:
+        - Fuel Price Suggestions
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: ID propozycji ceny paliwa
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Propozycja ceny paliwa została usunięta
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: "Propozycja ceny paliwa została usunięta."
 
 components:
   schemas:
+    Station:
+      type: object
+      properties:
+        id:
+          type: integer
+        brand_id:
+          type: integer
+        name:
+          type: string
+        address:
+          type: string
+        latitude:
+          type: number
+          format: float
+        longitude:
+          type: number
+          format: float
+        fuels:
+          type: array
+          items:
+            $ref: '#/components/schemas/StationFuelType'
+      required:
+        - brand_id
+        - name
+        - address
+        - latitude
+        - longitude
+
     User:
       type: object
       properties:
@@ -240,34 +371,12 @@ components:
           type: string
         email:
           type: string
-    RegisterUser:
-      type: object
-      properties:
-        name:
-          type: string
-        email:
-          type: string
-        password:
-          type: string
-    LoginUser:
-      type: object
-      properties:
-        email:
-          type: string
-        password:
-          type: string
-    Brand:
-      type: object
-      properties:
-        id:
-          type: integer
-        name:
-          type: string
-    BrandInput:
-      type: object
-      properties:
-        name:
-          type: string
+        is_admin:
+          type: boolean
+      required:
+        - name
+        - email
+
     FuelType:
       type: object
       properties:
@@ -275,46 +384,39 @@ components:
           type: integer
         name:
           type: string
-    FuelTypeInput:
+      required:
+        - name
+
+    StationFuelType:
       type: object
       properties:
-        name:
-          type: string
+        id:
+          type: integer
+        station_id:
+          type: integer
+        fuel_type_id:
+          type: integer
+      required:
+        - station_id
+        - fuel_type_id
+
     FuelPriceSuggestion:
       type: object
       properties:
         id:
           type: integer
-        user_id:
+        station_id:
           type: integer
-        price:
-          type: number
-    FuelPriceSuggestionInput:
-      type: object
-      properties:
-        price:
-          type: number
-    Station:
-      type: object
-      properties:
-        id:
+        fuel_type_id:
           type: integer
-        name:
+        suggested_price:
+          type: number
+          format: float
+        suggested_on:
           type: string
-        address:
-          type: string
-    StationInput:
-      type: object
-      properties:
-        name:
-          type: string
-        address:
-          type: string
-
-securitySchemes:
-  sanctumAuth:
-    type: http
-    scheme: bearer
-  adminAuth:
-    type: http
-    scheme: bearer
+          format: date
+      required:
+        - station_id
+        - fuel_type_id
+        - suggested_price
+        - suggested_on
