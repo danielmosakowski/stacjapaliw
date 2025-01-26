@@ -69,3 +69,8 @@ Aplikacja będzie dostępna pod adresem:
 ```
 http://127.0.0.1:8000
 ```
+Dokumentacja OpenAPi:
+```
+http://localhost:8000/swagger-ui/index.html
+```
+
